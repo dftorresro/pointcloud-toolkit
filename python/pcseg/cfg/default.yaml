@@ -1,0 +1,27 @@
+exp_name: dgcnn_partseg
+log_dir: runs
+
+dataset:
+  name: shapenetpart
+  root: /path/to/shapenetpart_hdf5_2048
+  num_points: 2048
+  num_part_classes: 50
+
+model:
+  name: dgcnn
+  k: 20
+  emb_dims: 1024
+  dropout: 0.5
+
+optim:
+  epochs: 200
+  batch_size: 16
+  lr: 0.10
+  use_sgd: true
+  scheduler: step
+  step_size: 20
+  gamma: 0.7
+
+misc:
+  num_workers: 4
+  seed: 42
