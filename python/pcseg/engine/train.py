@@ -8,10 +8,14 @@ from pcseg.engine.utils import loss_fn, Logger
 def set_seed(s):
     torch.manual_seed(s); np.random.seed(s); random.seed(s)
     if torch.cuda.is_available(): torch.cuda.manual_seed_all(s)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    return device
 
 def train_loop(cfg_path: str):
     cfg = OmegaConf.load(cfg_path)
-    set_seed(cfg.misc.seed)
+    device = set_seed(cfg.misc.seed)
 
     log_root = pathlib.Path(cfg.log_dir) / time.strftime("%Y-%m-%d_%H-%M-%S")
     logger = Logger(log_root / 'log.txt')
@@ -23,7 +27,9 @@ def train_loop(cfg_path: str):
     test_ld  = DataLoader(test_ds,  cfg.optim.batch_size, False, num_workers=cfg.misc.num_workers)
 
     model = DGCNNPartSeg(k=cfg.model.k, emb_dims=cfg.model.emb_dims,
-                         dropout=cfg.model.dropout, num_part_classes=cfg.dataset.num_part_classes).cuda()
+                         dropout=cfg.model.dropout, num_part_classes=cfg.dataset.num_part_classes).to(device)
+    logger.log(f"Model: {model.__class__.__name__}  Params: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+    
     opt = (torch.optim.SGD if cfg.optim.use_sgd else torch.optim.Adam)(
         model.parameters(), lr=cfg.optim.lr, momentum=0.9, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.StepLR(opt, cfg.optim.step_size, cfg.optim.gamma) \
