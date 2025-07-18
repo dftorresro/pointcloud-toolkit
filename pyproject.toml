@@ -1,11 +1,14 @@
-[build-system]
-requires = ["scikit-build-core>=0.5", "pybind11"]
-build-backend = "scikit_build_core.build"
-
 [project]
 name = "pointcloud-seg-viewer"
 version = "0.1.0"
 dependencies = ["torch", "open3d", "typer", "omegaconf", "tqdm"]
+
+[project.scripts]
+pcseg = "pcseg.cli:app"
+
+[build-system]
+requires = ["scikit-build-core>=0.5", "pybind11"]
+build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
