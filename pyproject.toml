@@ -1,14 +1,29 @@
 [project]
 name = "pointcloud-seg-viewer"
 version = "0.1.0"
+description = "Point cloud segmentation toolkit (DGCNN-style) with CLI and Open3D viewer."
+readme = "README.md"
+requires-python = ">=3.9"
 dependencies = ["torch", "open3d", "typer", "omegaconf", "tqdm"]
 
 [project.scripts]
 pcseg = "pcseg.cli:app"
 
 [build-system]
-requires = ["scikit-build-core>=0.5", "pybind11"]
+requires = ["scikit-build-core>=0.5", "setuptools>=64", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
+
+[tool.setuptools]
+# your sources live under the 'python/' folder
+package-dir = { "" = "python" }
+
+[tool.setuptools.packages.find]
+where = ["python"]
+include = ["pcseg*"]
+
+# optional: include configs in the wheel
+[tool.setuptools.package-data]
+pcseg = ["**/*.yaml", "**/*.yml", "**/*.txt"]

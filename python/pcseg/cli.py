@@ -1,9 +1,17 @@
-import typer; from pcseg.engine.train import train_loop
-app = typer.Typer(add_completion=False)
+import typer
+app = typer.Typer()
 
 @app.command()
-def train(cfg: str = "python/pcseg/cfg/default.yaml"):
-    """Train point-cloud segmentation model."""
-    train_loop(cfg)
+def train(config: str = "python/pcseg/cfg/default.yaml"):
+    import torch  # lazy import
+    from .engine import train as train_mod
+    train_mod.main(config)
 
-if __name__ == "__main__": app()
+@app.command()
+def view(path: str):
+    import open3d as o3d  # lazy import
+    from .visualize_open3d import main as viz
+    viz(path)
+
+if __name__ == "__main__":
+    app()
